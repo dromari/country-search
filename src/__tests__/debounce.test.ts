@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { debounce } from '../debounce.js';
+import { debounce } from '../core/debounce.js';
 
 type Procedure = (...args: unknown[]) => void;
 
