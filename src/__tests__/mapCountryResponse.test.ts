@@ -78,4 +78,28 @@ describe('mapCountryResponse', () => {
       currencies: [],
     });
   });
+
+  it('should map countries.dev format where name/capital are strings and languages/currencies are arrays', () => {
+    const countriesDevRaw = {
+      name: 'Spain',
+      capital: 'Madrid',
+      region: 'Europe',
+      population: 47351567,
+      area: 505992,
+      borders: ['AND', 'FRA'],
+      flags: {
+        svg: 'https://flagcdn.com',
+        png: 'https://flagcdn.com',
+      },
+      languages: [{ code: 'spa', name: 'Spanish' }],
+      currencies: [{ code: 'EUR', name: 'Euro', symbol: '€' }],
+    };
+
+    const result = mapCountryResponse(countriesDevRaw);
+
+    expect(result.name).toBe('Spain');
+    expect(result.capital).toBe('Madrid');
+    expect(result.languages).toEqual(['Spanish']);
+    expect(result.currencies).toEqual(['Euro (€)']);
+  });
 });

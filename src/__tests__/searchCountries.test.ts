@@ -36,7 +36,7 @@ describe('searchCountries', () => {
     const result = await searchCountries('spain', controller.signal);
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockFetch).toHaveBeenCalledWith('https://countries.dev/spain', {
+    expect(mockFetch).toHaveBeenCalledWith('https://countries.dev/name/spain', {
       signal: controller.signal,
     });
     expect(result).toHaveLength(1);

@@ -5,7 +5,7 @@ import {
   type RawCountryResponse,
 } from '../core/mapCountryResponse.js';
 
-const BASE_URL = 'https://countries.dev';
+const BASE_URL = 'https://countries.dev/name';
 
 export async function searchCountries(query: string, signal: AbortSignal): Promise<Country[]> {
   const encodedQuery = encodeURIComponent(query.trim());
