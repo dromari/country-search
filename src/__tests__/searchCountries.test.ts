@@ -40,8 +40,8 @@ describe('searchCountries', () => {
       signal: controller.signal,
     });
     expect(result).toHaveLength(1);
-    expect(result.name).toBe('Spain');
-    expect(result.capital).toBe('Madrid');
+    expect(result[0].name).toBe('Spain');
+    expect(result[0].capital).toBe('Madrid');
   });
 
   it('should return an empty array on 404 Not Found without throwing an error', async () => {
