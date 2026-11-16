@@ -181,3 +181,29 @@ body {
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.history-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.history-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+}
+
+.history-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}

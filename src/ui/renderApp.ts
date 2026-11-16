@@ -1,5 +1,6 @@
 import { createSearchManager, type SearchState } from '../core/searchManager.js';
 import type { Country } from '../core/mapCountryResponse.js';
+import { addToSearchHistory, getSearchHistory } from '../core/searchHistory.js';
 
 function createEl<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -102,11 +103,25 @@ export function initApp(): void {
   input.placeholder = 'Enter country name (e.g. Spain, Japan)...';
   input.ariaLabel = 'Search country by name';
 
+  const historyContainer = createEl('div', 'history-bar');
   const contentArea = createEl('section');
 
-  header.append(heading, input);
+  header.append(heading, input, historyContainer);
   container.append(header, contentArea);
   document.body.append(container);
+
+  const renderHistory = (items: string[]): void => {
+    historyContainer.replaceChildren();
+    for (const item of items) {
+      const chip = createEl('button', 'history-chip', item);
+      chip.type = 'button';
+      chip.addEventListener('click', () => {
+        input.value = item;
+        searchManager.searchImmediate(item);
+      });
+      historyContainer.append(chip);
+    }
+  };
 
   const renderState = (state: SearchState): void => {
     contentArea.replaceChildren();
@@ -146,7 +161,12 @@ export function initApp(): void {
     contentArea.append(grid);
   };
 
-  const searchManager = createSearchManager(renderState);
+  const searchManager = createSearchManager(renderState, 300, 5000, (successfulQuery) => {
+    const updatedHistory = addToSearchHistory(successfulQuery);
+    renderHistory(updatedHistory);
+  });
+
+  renderHistory(getSearchHistory());
 
   input.addEventListener('input', () => {
     searchManager.handleInput(input.value);

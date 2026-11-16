@@ -1,7 +1,8 @@
-import { debounce } from '../core/debounce.js';
+import { debounce } from './debounce.js';
 import { searchCountries } from './searchCountries.js';
+import { createCachedSearch } from './cachedSearch.js';
 import { HttpError } from './HttpError.js';
-import type { Country } from '../core/mapCountryResponse.js';
+import type { Country } from './mapCountryResponse.js';
 
 export type SearchStatus = 'idle' | 'loading' | 'success' | 'empty' | 'error';
 
@@ -13,6 +14,7 @@ export interface SearchState {
 
 export interface SearchManager {
   handleInput: (rawQuery: string) => void;
+  searchImmediate: (rawQuery: string) => void;
   retry: () => void;
 }
 
@@ -22,8 +24,10 @@ const DEFAULT_TIMEOUT_MS = 5000;
 export function createSearchManager(
   onStateChange: (state: SearchState) => void,
   debounceMs: number = DEFAULT_DEBOUNCE_MS,
-  timeoutMs: number = DEFAULT_TIMEOUT_MS
+  timeoutMs: number = DEFAULT_TIMEOUT_MS,
+  onSuccessQuery?: (query: string) => void
 ): SearchManager {
+  const cachedSearch = createCachedSearch(searchCountries);
   let activeController: AbortController | null = null;
   let lastQuery = '';
 
@@ -51,10 +55,14 @@ export function createSearchManager(
     }, timeoutMs);
 
     try {
-      const countries = await searchCountries(query, controller.signal);
+      const countries = await cachedSearch(query, controller.signal);
 
       if (controller.signal.aborted) {
         return;
+      }
+
+      if (countries.length > 0 && onSuccessQuery) {
+        onSuccessQuery(query);
       }
 
       onStateChange({
@@ -127,6 +135,14 @@ export function createSearchManager(
     debouncedSearch(trimmed);
   };
 
+  const searchImmediate = (rawQuery: string): void => {
+    const trimmed = rawQuery.trim();
+    lastQuery = trimmed;
+    if (trimmed) {
+      void executeSearch(trimmed);
+    }
+  };
+
   const retry = (): void => {
     if (lastQuery) {
       void executeSearch(lastQuery);
@@ -135,6 +151,7 @@ export function createSearchManager(
 
   return {
     handleInput,
+    searchImmediate,
     retry,
   };
 }
